@@ -155,7 +155,7 @@ namespace OpenGL
         ///     Enable server-side GL capabilities.
         /// </summary>
         /// <param name="cap">Specifies a symbolic constant indicating a GL capability.</param>
-        public static void glEnable(int cap) => _glEnable(cap);
+        public static void glEnable(int cap) => GlEnable(cap);
 
         /// <summary>
         ///     Disable server-side GL capabilities.
@@ -9613,11 +9613,13 @@ namespace OpenGL
         private static PFNGLSECONDARYCOLORP3UIPROC _glSecondaryColorP3ui;
         private static PFNGLSECONDARYCOLORP3UIVPROC _glSecondaryColorP3uiv;
 
+        private static PFNGLENABLEPROC GlEnable { get => _glEnable; set => _glEnable = value; }
+
         /// <summary>
         ///     Imports all OpenGL functions using the specified loader.
         /// </summary>
         /// <param name="loader">A loader to retrieve a fuction pointer.</param>
-		public static void Import(GetProcAddressHandler loader)
+        public static void Import(GetProcAddressHandler loader)
         {
             _glCullFace = Marshal.GetDelegateForFunctionPointer<PFNGLCULLFACEPROC>(loader.Invoke("glCullFace"));
             _glFrontFace = Marshal.GetDelegateForFunctionPointer<PFNGLFRONTFACEPROC>(loader.Invoke("glFrontFace"));
@@ -9641,6 +9643,7 @@ namespace OpenGL
             _glColorMask = Marshal.GetDelegateForFunctionPointer<PFNGLCOLORMASKPROC>(loader.Invoke("glColorMask"));
             _glDepthMask = Marshal.GetDelegateForFunctionPointer<PFNGLDEPTHMASKPROC>(loader.Invoke("glDepthMask"));
             _glDisable = Marshal.GetDelegateForFunctionPointer<PFNGLDISABLEPROC>(loader.Invoke("glDisable"));
+            GlEnable = Marshal.GetDelegateForFunctionPointer<PFNGLENABLEPROC>(loader.Invoke("glEnable"));
             _glEnable = Marshal.GetDelegateForFunctionPointer<PFNGLENABLEPROC>(loader.Invoke("glEnable"));
             _glFinish = Marshal.GetDelegateForFunctionPointer<PFNGLFINISHPROC>(loader.Invoke("glFinish"));
             _glFlush = Marshal.GetDelegateForFunctionPointer<PFNGLFLUSHPROC>(loader.Invoke("glFlush"));

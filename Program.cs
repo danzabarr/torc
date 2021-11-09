@@ -1,72 +1,116 @@
-﻿using System;
+﻿using torc;
+using System;
 using GLFW;
-using static OpenGL.GL;
 using GlmNet;
-using torc;
+using System.Timers;
+using static OpenGL.GL;
 
 class Program
 {
+    public static Window window;
+    public static int width = 1024;
+    public static int height = 576;
+    public static float targetFPS = 30;
+    public static long interval = (long)((1f / targetFPS) * 1000000000L);
+    public static long counter;
+    public static Scene activeScene = new();
 
-    /// <summary>
-    /// Obligatory name for your first OpenGL example program.
-    /// </summary>
-    private const string TITLE = "Hello Triangle!";
+    static void Main()
+    {
+        Setup();
+        LoadScene();
+        MainLoop();
+    }
 
-    static void Main(string[] args)
+    private static void Setup()
+    {
+        PrepareContext();
+        CreateWindow();
+        InitGLCapabilities();
+    }
+
+    private static void CreateWindow()
+    {
+        window = CreateWindow("Testing", width, height);
+    }
+
+    private static void InitGLCapabilities()
+    {
+        glEnable(GL_DEPTH_TEST);
+    }
+
+
+    private static void LoadScene()
+    {
+        Camera camera = new GameObject().AddComponent<Camera>();
+        camera.Aspect *= (float)width / (float)height;
+        camera.Object.Rotate(-20, new vec3(1, 0, 0));
+        camera.Object.Translate(0, 0, 3);
+
+        GameObject cube = new();
+        cube.AddComponent<TestRotator>();
+
+        Shader shader = Shader.Load("simple.vert", "simple.frag");
+        MeshRenderer cubeRenderer = cube.AddComponent<MeshRenderer>();
+        cubeRenderer.material = new(shader);
+        cubeRenderer.material.SetProperty("color", new vec3(1, 0, 0));
+        cubeRenderer.material.Use();
+        cubeRenderer.material.UploadProperties();
+
+        cubeRenderer.Mesh = Mesh.Cube;
+
+        activeScene.Add(camera.Object);
+        activeScene.Add(cube);
+    }
+
+    private static void MainLoop()
     {
 
-        Transform t = new Transform(3, 3, 3);
-
-        Console.WriteLine(t);
-
-        t.LocalPosition += new vec3(1, 1, 1);
-
-        t.Rotate(90, new vec3(0, 1, 0));
-        t.Rotate(-90, new vec3(0, 1, 0));
-
-        Console.WriteLine(t);
-
-        return;
-
-        // Set context creation hints
-        PrepareContext();
-        // Create a window and shader program
-        var window = CreateWindow(1024, 800);
-        var program = CreateProgram();
-
-        // Define a simple triangle
-        CreateVertices(out var vao, out var vbo);
-        rand = new Random();
-
-        var location = glGetUniformLocation(program, "color");
-        SetRandomColor(location);
-        long n = 0;
+        glViewport(0, 0, width, height);
+        glDepthMask(true);
+        long lastTime = NanoTime();
 
         while (!Glfw.WindowShouldClose(window))
         {
-            // Swap fore/back framebuffers, and poll for operating system events.
-            Glfw.SwapBuffers(window);
-            Glfw.PollEvents();
+            long currentTime = NanoTime();
+            long deltaTime = currentTime - lastTime;
+            counter += deltaTime;
+            lastTime = currentTime;
 
-            // Clear the framebuffer to defined background color
-            glClear(GL_COLOR_BUFFER_BIT);
+            while (counter >= interval)
+            {
+                counter -= interval;
+                Update();
+            }
 
-            if (n++ % 60 == 0)
-                SetRandomColor(location);
-
-            // Draw the triangle.
-            glDrawArrays(GL_TRIANGLES, 0, 3);
+            Render();
         }
 
         Glfw.Terminate();
     }
-
-    private static void SetRandomColor(int location)
+    private static long NanoTime()
     {
-        var r = (float)rand.NextDouble();
-        var g = (float)rand.NextDouble();
-        var b = (float)rand.NextDouble();
-        glUniform3f(location, r, g, b);
+        long nano = 10000L * System.Diagnostics.Stopwatch.GetTimestamp();
+        nano /= TimeSpan.TicksPerMillisecond;
+        nano *= 100L;
+        return nano;
+    }
+
+    private static void Render()
+    {
+        // Swap fore/back framebuffers, and poll for operating system events.
+        Glfw.SwapBuffers(window);
+        Glfw.PollEvents();
+
+        // Clear the framebuffer to defined background color
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        activeScene.Render();
+    }
+
+    private static void Update()
+    {
+        activeScene.Update();
     }
 
     private static void PrepareContext()
@@ -86,10 +130,10 @@ class Program
     /// <param name="width">The width of the client area, in pixels.</param>
     /// <param name="height">The height of the client area, in pixels.</param>
     /// <returns>A handle to the created window.</returns>
-    private static Window CreateWindow(int width, int height)
+    private static Window CreateWindow(string title, int width, int height)
     {
         // Create window, make the OpenGL context current on the thread, and import graphics functions
-        var window = Glfw.CreateWindow(width, height, TITLE, Monitor.None, Window.None);
+        var window = Glfw.CreateWindow(width, height, title, Monitor.None, Window.None);
 
         // Center window
         var screen = Glfw.PrimaryMonitor.WorkArea;
@@ -100,89 +144,6 @@ class Program
         Glfw.MakeContextCurrent(window);
         Import(Glfw.GetProcAddress);
 
-
-
         return window;
     }
-
-    /// <summary>
-    /// Creates an extremely basic shader program that is capable of displaying a triangle on screen.
-    /// </summary>
-    /// <returns>The created shader program. No error checking is performed for this basic example.</returns>
-    private static uint CreateProgram()
-    {
-        var vertex = CreateShader(GL_VERTEX_SHADER, @"#version 330 core
-                                                    layout (location = 0) in vec3 pos;
-
-                                                    void main()
-                                                    {
-                                                        gl_Position = vec4(pos.x, pos.y, pos.z, 1.0);
-                                                    }");
-        var fragment = CreateShader(GL_FRAGMENT_SHADER, @"#version 330 core
-                                                        out vec4 result;
-
-                                                        uniform vec3 color;
-
-                                                        void main()
-                                                        {
-                                                            result = vec4(color, 1.0);
-                                                        } ");
-
-        var program = glCreateProgram();
-        glAttachShader(program, vertex);
-        glAttachShader(program, fragment);
-
-        glLinkProgram(program);
-
-        glDeleteShader(vertex);
-        glDeleteShader(fragment);
-
-        glUseProgram(program);
-        return program;
-    }
-
-    /// <summary>
-    /// Creates a shader of the specified type from the given source string.
-    /// </summary>
-    /// <param name="type">An OpenGL enum for the shader type.</param>
-    /// <param name="source">The source code of the shader.</param>
-    /// <returns>The created shader. No error checking is performed for this basic example.</returns>
-    private static uint CreateShader(int type, string source)
-    {
-        var shader = glCreateShader(type);
-        glShaderSource(shader, source);
-        glCompileShader(shader);
-        return shader;
-    }
-
-    /// <summary>
-    /// Creates a VBO and VAO to store the vertices for a triangle.
-    /// </summary>
-    /// <param name="vao">The created vertex array object for the triangle.</param>
-    /// <param name="vbo">The created vertex buffer object for the triangle.</param>
-    private static unsafe void CreateVertices(out uint vao, out uint vbo)
-    {
-
-        var vertices = new[] {
-            -0.5f, -0.5f, 0.0f,
-            0.5f, -0.5f, 0.0f,
-            0.0f,  0.5f, 0.0f
-        };
-
-        vao = glGenVertexArray();
-        vbo = glGenBuffer();
-
-        glBindVertexArray(vao);
-
-        glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        fixed (float* v = &vertices[0])
-        {
-            glBufferData(GL_ARRAY_BUFFER, sizeof(float) * vertices.Length, v, GL_STATIC_DRAW);
-        }
-
-        glVertexAttribPointer(0, 3, GL_FLOAT, false, 3 * sizeof(float), NULL);
-        glEnableVertexAttribArray(0);
-    }
-
-    private static Random rand;
 }
