@@ -78,6 +78,7 @@ namespace torc
             uint vertex = CreateShader(GL_VERTEX_SHADER, vertexText);
             uint fragment = CreateShader(GL_FRAGMENT_SHADER, fragmentText);
 
+
             uint id = glCreateProgram();
             glAttachShader(id, vertex);
             glAttachShader(id, fragment);

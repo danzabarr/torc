@@ -90,11 +90,72 @@ namespace torc
             public vec3 LocalScale
             {
                 get => new(m[0, 0], m[1, 1], m[2, 2]);
-                private set
+                set
                 {
                     m[0, 0] = value.x;
                     m[1, 1] = value.y;
                     m[2, 2] = value.z;
+                }
+            }
+
+            public vec3 Position
+            {
+                get
+                {
+                    mat4 world = WorldMatrix;
+                    return new(world[3, 0], world[3, 1], world[3, 2]);
+                }
+            }
+
+            public vec3 EulerAngles
+            {
+                get
+                {
+                    if (m[0, 0] == 1.0f)
+                        return new vec3(glm.degrees(glm.atan(m[0, 2], m[2, 3])), 0, 0);
+                    else if (m[0, 0] == -1.0f)
+                        return new vec3(glm.degrees(glm.atan(m[0, 2], m[2, 3])), 0, 0);
+                    else
+                        return new vec3(glm.degrees(glm.atan(-m[2, 0], m[0, 0])), glm.degrees(glm.asin(m[1, 0])), glm.degrees(glm.atan(-m[1, 2], m[1, 1])));
+                }
+                set
+                {
+
+                    vec3 position = LocalPosition;
+                    vec3 scale = LocalScale;
+                    vec3 rotation = value;
+
+                    m = mat4.identity();
+                    Translate(position);
+                    //Scale(scale);
+                    Rotate(rotation.x, new vec3(1, 0, 0));
+                    Rotate(rotation.y, new vec3(0, 1, 0));
+                    Rotate(rotation.z, new vec3(0, 0, 1));
+                    return;
+                    /*
+                    float pitch = glm.radians(value.x);
+                    float yaw = glm.radians(value.y);
+                    float roll = glm.radians(value.z);
+
+                    float cosPitch = glm.cos(pitch);
+                    float sinPitch = glm.sin(pitch);
+
+                    float cosYaw = glm.cos(yaw);
+                    float sinYaw = glm.sin(yaw);
+
+                    float cosRoll = glm.cos(roll);
+                    float sinRoll = glm.sin(roll);
+
+                    m[0, 0] = cosPitch * cosYaw;
+                    m[0, 1] = cosPitch * sinYaw;
+                    m[0, 2] = -sinPitch;
+                    m[1, 0] = sinRoll * sinPitch * cosYaw - cosRoll * sinYaw;
+                    m[1, 1] = sinRoll * sinPitch * sinYaw + cosRoll * cosPitch;
+                    m[1, 2] = cosPitch * sinRoll;
+                    m[2, 0] = cosRoll * sinPitch * cosYaw + sinRoll * sinYaw;
+                    m[2, 1] = cosRoll * sinPitch * sinYaw - sinRoll * cosPitch;
+                    m[2, 2] = cosPitch * cosRoll;
+                    */
                 }
             }
 
@@ -153,16 +214,15 @@ namespace torc
                 m[2] = v2;
             }
 
-            public vec3 EulerAngles
+            public vec3 Forward
             {
                 get
                 {
-                    if (m[0, 0] == 1.0f)
-                        return new vec3(glm.degrees(glm.atan(m[0, 2], m[2, 3])), 0, 0);
-                    else if (m[0, 0] == -1.0f)
-                        return new vec3(glm.degrees(glm.atan(m[0, 2], m[2, 3])), 0, 0);
-                    else
-                        return new vec3(glm.degrees(glm.atan(-m[2, 0], m[0, 0])), glm.degrees(glm.asin(m[1, 0])), glm.degrees(glm.atan(-m[1, 2], m[1, 1])));
+                    vec4 forward = new vec4(0, 0, 1, 0);
+
+                    forward = m * forward;
+                    Console.WriteLine(forward);
+                    return new vec3(forward.x, forward.y, forward.z);
                 }
             }
 

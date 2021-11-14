@@ -45,10 +45,6 @@ namespace torc
 
                 int location = glGetUniformLocation(shader.id, key);
 
-                Console.WriteLine(key);
-                Console.WriteLine(value);
-                Console.WriteLine(location);
-
                 switch (value)
                 {
                     case float:
@@ -74,18 +70,30 @@ namespace torc
                     default:
                         Console.WriteLine("Unsupported uniform type: " + value.GetType().ToString());
                         break;
-                        
                 }
             }
         }
         
-        public void UniformMatrices(Camera camera, mat4 model)
+        public void UniformLight(Light light)
         {
-            UniformMatrices(model, camera.ViewMatrix, camera.ProjectionMatrix);   
+            UniformLight(light.Object.Forward, light.color, light.brightness, light.specularStrength);
         }
 
-        public void UniformMatrices(mat4 model, mat4 view, mat4 proj)
+        public void UniformLight(vec3 direction, vec3 color, float brightness, float specular)
         {
+            glUniform3f(glGetUniformLocation(shader.id, "lightDir"), direction.x, direction.y, direction.z);
+            glUniform3f(glGetUniformLocation(shader.id, "lightColor"), color.x * brightness, color.y * brightness, color.z * brightness);
+            glUniform1f(glGetUniformLocation(shader.id, "specularStrength"), specular);
+        }
+
+        public void UniformMatrices(Camera camera, mat4 model)
+        {
+            UniformMatrices(camera.Object.Position, model, camera.ViewMatrix, camera.ProjectionMatrix);   
+        }
+
+        public void UniformMatrices(vec3 viewPos, mat4 model, mat4 view, mat4 proj)
+        {
+            glUniform3f(glGetUniformLocation(shader.id, "viewPos"), viewPos.x, viewPos.y, viewPos.z); 
             glUniformMatrix4fv(glGetUniformLocation(shader.id, "model"), 1, false, model.to_array());
             glUniformMatrix4fv(glGetUniformLocation(shader.id, "view"), 1, false, view.to_array());
             glUniformMatrix4fv(glGetUniformLocation(shader.id, "proj"), 1, false, proj.to_array());

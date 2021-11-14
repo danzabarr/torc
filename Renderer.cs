@@ -12,7 +12,7 @@
         public void UseMaterial(Camera camera)
         {
             material.Use();
-            material.UniformMatrices(Object.Matrix, camera.ViewMatrix, camera.ProjectionMatrix);
+            material.UniformMatrices(camera.Object.Position, Object.Matrix, camera.ViewMatrix, camera.ProjectionMatrix);
         }
 
         public void Render()

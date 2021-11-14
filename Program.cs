@@ -37,6 +37,7 @@ class Program
     private static void InitGLCapabilities()
     {
         glEnable(GL_DEPTH_TEST);
+        //glEnable(GL_CULL_FACE);
     }
 
 
@@ -45,27 +46,46 @@ class Program
         Camera camera = new GameObject().AddComponent<Camera>();
         camera.Aspect *= (float)width / (float)height;
         camera.Object.Rotate(-20, new vec3(1, 0, 0));
-        camera.Object.Translate(0, 0, 3);
+        camera.Object.Translate(0, 0, 10);
+
+        DirectionalLight light = new GameObject().AddComponent<DirectionalLight>();
+        light.color = new vec3(1, 1, 1);
+        light.brightness = 1;
+        light.Object.Translate(1.5f, 2.5f, 0.5f);
+        light.Object.Rotate(45, new vec3(-.5f, -.8f, 0));
 
         GameObject cube = new();
         cube.AddComponent<TestRotator>();
 
         Shader shader = Shader.Load("simple.vert", "simple.frag");
-        MeshRenderer cubeRenderer = cube.AddComponent<MeshRenderer>();
-        cubeRenderer.material = new(shader);
-        cubeRenderer.material.SetProperty("color", new vec3(1, 0, 0));
-        cubeRenderer.material.Use();
-        cubeRenderer.material.UploadProperties();
 
+        Mesh missile = Mesh.LoadObjFile("missile.obj");
+
+        Material material = new(shader);
+        material.Use();
+        material.UploadProperties();
+        material.UniformLight(light);
+
+        MeshRenderer cubeRenderer = cube.AddComponent<MeshRenderer>();
+        cubeRenderer.material = material;
         cubeRenderer.Mesh = Mesh.Cube;
 
+        MeshRenderer lightRenderer = light.Object.AddComponent<MeshRenderer>();
+        lightRenderer.material = material;
+        lightRenderer.Mesh = missile;
+
+        Texture texture = new Texture("yoda.jpg");
+
+        glActiveTexture(0);
+        glBindTexture(GL_TEXTURE_2D, texture.id);
+
         activeScene.Add(camera.Object);
+        activeScene.Add(light.Object);
         activeScene.Add(cube);
     }
 
     private static void MainLoop()
     {
-
         glViewport(0, 0, width, height);
         glDepthMask(true);
         long lastTime = NanoTime();
