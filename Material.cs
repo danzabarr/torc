@@ -9,6 +9,7 @@ namespace torc
     class Material
     {
         public Shader shader;
+        public Texture[] textures;
         private readonly Dictionary<string, object> properties = new();
 
         public Material(Shader shader)
@@ -19,6 +20,12 @@ namespace torc
         public void Use()
         {
             shader.Use();
+
+            if (textures != null) for (int i = 0; i < textures.Length; i++)
+            {
+                glActiveTexture(i);
+                glBindTexture(GL_TEXTURE_2D, textures[i].id);
+            }
         }
 
         public int GetUniformLocation(string name)
