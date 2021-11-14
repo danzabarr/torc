@@ -31,35 +31,32 @@ class Program
 
     private static void CreateWindow()
     {
-        window = CreateWindow("Testing", width, height);
+        window = CreateWindow("torc", width, height);
     }
 
     private static void InitGLCapabilities()
     {
         glEnable(GL_DEPTH_TEST);
-        //glEnable(GL_CULL_FACE);
+        glEnable(GL_CULL_FACE);
     }
-
 
     private static void LoadScene()
     {
         Camera camera = new GameObject().AddComponent<Camera>();
         camera.Aspect *= (float)width / (float)height;
-        camera.Object.Rotate(-20, new vec3(1, 0, 0));
+        camera.Object.Rotate(-20, new(1, 0, 0));
         camera.Object.Translate(0, 0, 10);
 
         DirectionalLight light = new GameObject().AddComponent<DirectionalLight>();
-        light.color = new vec3(1, 1, 1);
+        light.color = new(1, 1, 1);
         light.brightness = 1;
-        light.Object.Translate(1.5f, 2.5f, 0.5f);
-        light.Object.Rotate(45, new vec3(-.5f, -.8f, 0));
+        light.Object.Translate(1.5f, 1.5f, 0.5f);
+        light.Object.Rotate(45, new(-.5f, -.8f, 0));
 
         GameObject cube = new();
         cube.AddComponent<TestRotator>();
 
         Shader shader = Shader.Load("simple.vert", "simple.frag");
-
-        Mesh missile = Mesh.LoadObjFile("missile.obj");
 
         Material material = new(shader);
         material.Use();
@@ -70,17 +67,24 @@ class Program
         cubeRenderer.material = material;
         cubeRenderer.Mesh = Mesh.Cube;
 
-        MeshRenderer lightRenderer = light.Object.AddComponent<MeshRenderer>();
-        lightRenderer.material = material;
-        lightRenderer.Mesh = missile;
+        GameObject missile = new GameObject();
+        MeshRenderer missileRenderer = missile.AddComponent<MeshRenderer>();
+        missile.Scale(.2f);
+        missile.Rotate(90, new(-1, 0, 0));
 
-        Texture texture = new Texture("yoda.jpg");
+        missileRenderer.Mesh = Mesh.LoadObjFile("missile.obj");
+        missileRenderer.material = material;
+
+        missile.Parent = light.Object;
+
+        Texture texture = new("yoda.jpg");
 
         glActiveTexture(0);
         glBindTexture(GL_TEXTURE_2D, texture.id);
 
         activeScene.Add(camera.Object);
         activeScene.Add(light.Object);
+        activeScene.Add(missile);
         activeScene.Add(cube);
     }
 
@@ -136,6 +140,7 @@ class Program
     private static void PrepareContext()
     {
         // Set some common hints for the OpenGL profile creation
+        Glfw.WindowHint(Hint.Resizable, true);
         Glfw.WindowHint(Hint.ClientApi, ClientApi.OpenGL);
         Glfw.WindowHint(Hint.ContextVersionMajor, 3);
         Glfw.WindowHint(Hint.ContextVersionMinor, 3);
@@ -163,6 +168,12 @@ class Program
 
         Glfw.MakeContextCurrent(window);
         Import(Glfw.GetProcAddress);
+
+        Glfw.SetFramebufferSizeCallback(window, (Window window, int width, int height) =>
+        {
+            glViewport(0, 0, width, height);
+            activeScene.main.Aspect = (float) width / height;
+        });
 
         return window;
     }

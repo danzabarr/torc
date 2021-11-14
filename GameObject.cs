@@ -65,7 +65,7 @@ namespace torc
                 }
             }
 
-            private mat4 WorldMatrix
+            public mat4 WorldMatrix
             {
                 get
                 {
@@ -218,10 +218,28 @@ namespace torc
             {
                 get
                 {
-                    vec4 forward = new vec4(0, 0, 1, 0);
+                    vec4 forward = new(0, 0, 1, 0);
+                    forward = WorldMatrix * forward;
+                    return new vec3(forward.x, forward.y, forward.z);
+                }
+            }
 
-                    forward = m * forward;
-                    Console.WriteLine(forward);
+            public vec3 Up
+            {
+                get
+                {
+                    vec4 forward = new(0, 1, 0, 0);
+                    forward = WorldMatrix * forward;
+                    return new vec3(forward.x, forward.y, forward.z);
+                }
+            }
+
+            public vec3 Right
+            {
+                get
+                {
+                    vec4 forward = new(1, 0, 0, 0);
+                    forward = WorldMatrix * forward;
                     return new vec3(forward.x, forward.y, forward.z);
                 }
             }

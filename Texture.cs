@@ -1,18 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static OpenGL.GL;
-//using SixLabors.ImageSharp;
-//using SixLabors.ImageSharp.PixelFormats;
+﻿using static OpenGL.GL;
 using System.Drawing;
+using System.Drawing.Imaging;
 
 namespace torc
 {
-
-
     class Texture
     {
         enum Wrap
@@ -25,8 +16,8 @@ namespace torc
         public readonly uint id;
         public readonly string path;
         public readonly int width, height;
-        public byte[] data;
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "<Pending>")]
         public Texture(
             string path, 
             int wrapS = GL_REPEAT, 
@@ -44,47 +35,25 @@ namespace torc
 
             this.path = path;
 
-            //Image<Rgba32> image = Image.Load<Rgba32>(directoryPath + path);
-
-            Bitmap image = new Bitmap(directoryPath + path);
+            Bitmap image = new(directoryPath + path);
 
             width = image.Width;
             height = image.Height;
 
-            Console.WriteLine(width);
-            Console.WriteLine(height);
-
-
-            /*
-            byte[] data = new byte[width * height * 4];
-            for (int y = 0; y < height; y++)
-            {
-                var row = image.GetPixelRowSpan(y);
-                for (int x = 0; x < width; x++)
-                {
-                    data[y * width + x + 0] = row[x].R;
-                    data[y * width + x + 1] = row[x].G;
-                    data[y * width + x + 2] = row[x].B;
-                    data[y * width + x + 3] = row[x].A;
-                }
-            }
-            unsafe
-            {
-                fixed (byte* dataPtr = &data[0])
-                {
-                    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_BYTE, dataPtr);
-                }
-            }
-            */
-            
-            System.Drawing.Imaging.BitmapData data = image.LockBits
+            BitmapData data = image.LockBits
             (
                 new Rectangle(0, 0, width, height), 
-                System.Drawing.Imaging.ImageLockMode.ReadOnly, 
-                System.Drawing.Imaging.PixelFormat.Format32bppArgb
+                ImageLockMode.ReadOnly,
+                image.PixelFormat
             );
-            
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data.Scan0);
+
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, image.PixelFormat switch
+            {
+                PixelFormat.Format32bppArgb => GL_RGBA,
+                PixelFormat.Format24bppRgb => GL_RGB,
+                _ => GL_RGBA,
+
+            }, GL_UNSIGNED_BYTE, data.Scan0);
         }
     }
 }
