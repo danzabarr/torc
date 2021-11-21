@@ -37,11 +37,29 @@ namespace OpenGL
             return Encoding.UTF8.GetString(buffer);
         }
 
+
         /// <summary>
         ///     The unsafe NULL pointer.
         ///     <para>Analog of IntPtr.Zero.</para>
         /// </summary>
         public static readonly void* NULL = (void*)0;
+
+
+
+
+
+        #region Methods
+
+
+        //ADDED BY DAN
+        public static void glLoadIdentity() => _glLoadIdentity();
+        public static void glBegin(int mode) => _glBegin(mode);
+        public static void glEnd() => _glEnd();
+        public static void glVertex2f(float x, float y) => _glVertex2f(x, y);
+        public static void glVertex3f(float x, float y, float z) => _glVertex3f(x, y, z);
+        public static void glColor3f(float r, float g, float b) => _glColor3f(r, g, b);
+        public static void glColor4f(float r, float g, float b, float a) => _glColor4f(r, g, b, a);
+
 
         /// <summary>
         ///     Specify whether front- or back-facing facets can be culled.
@@ -145,6 +163,7 @@ namespace OpenGL
         ///     </para>
         /// </summary>
         public static void glFinish() => _glFinish();
+
 
         /// <summary>
         ///     Force execution of GL commands in finite time.
@@ -7297,6 +7316,10 @@ namespace OpenGL
         /// <param name="bufferMode">Identifies the mode used to capture the varying variables when transform feedback is active.<para>ust be GL_INTERLEAVED_ATTRIBS or GL_SEPARATE_ATTRIBS.</para></param>
         public static void glTransformFeedbackVaryings(uint program, int count, /*const*/ byte** varyings, int bufferMode) => _glTransformFeedbackVaryings(program, count, varyings, bufferMode);
 
+        #endregion
+
+        #region Constants
+
         public const int GL_DEPTH_BUFFER_BIT = 0x00000100;
         public const int GL_STENCIL_BUFFER_BIT = 0x00000400;
         public const int GL_COLOR_BUFFER_BIT = 0x00004000;
@@ -8115,6 +8138,32 @@ namespace OpenGL
         public const int GL_TIME_ELAPSED = 0x88BF;
         public const int GL_TIMESTAMP = 0x8E28;
         public const int GL_INT_2_10_10_10_REV = 0x8D9F;
+
+        #endregion
+
+        #region Delegate declarations
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        private delegate void PFNGLLOADIDENTITY();
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        private delegate void PFNGLBEGIN(int mode);
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        private delegate void PFNGLEND();
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        private delegate void PFNGLVERTEX2F(float x, float y);
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        private delegate void PFNGLVERTEX3F(float x, float y, float z);
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        private delegate void PFNGLCOLOR3F(float r, float g, float b);
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        private delegate void PFNGLCOLOR4F(float r, float g, float b, float a);
+
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         private delegate void PFNGLCULLFACEPROC(int mode);
@@ -9238,6 +9287,18 @@ namespace OpenGL
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         private delegate void PFNGLSECONDARYCOLORP3UIVPROC(int type, /*const*/ uint* color);
 
+        #endregion
+
+        #region Delegate members
+
+        private static PFNGLLOADIDENTITY _glLoadIdentity;
+        private static PFNGLBEGIN _glBegin;
+        private static PFNGLEND _glEnd;
+        private static PFNGLVERTEX2F _glVertex2f;
+        private static PFNGLVERTEX3F _glVertex3f;
+        private static PFNGLCOLOR3F _glColor3f;
+        private static PFNGLCOLOR4F _glColor4f;
+
         private static PFNGLCULLFACEPROC _glCullFace;
         private static PFNGLFRONTFACEPROC _glFrontFace;
         private static PFNGLHINTPROC _glHint;
@@ -9615,12 +9676,22 @@ namespace OpenGL
 
         private static PFNGLENABLEPROC GlEnable { get => _glEnable; set => _glEnable = value; }
 
+        #endregion
+
         /// <summary>
         ///     Imports all OpenGL functions using the specified loader.
         /// </summary>
         /// <param name="loader">A loader to retrieve a fuction pointer.</param>
         public static void Import(GetProcAddressHandler loader)
         {
+            _glLoadIdentity = Marshal.GetDelegateForFunctionPointer<PFNGLLOADIDENTITY>(loader.Invoke("glLoadIdentity"));
+            _glBegin = Marshal.GetDelegateForFunctionPointer<PFNGLBEGIN>(loader.Invoke("glBegin"));
+            _glEnd = Marshal.GetDelegateForFunctionPointer<PFNGLEND>(loader.Invoke("glEnd"));
+            _glVertex2f = Marshal.GetDelegateForFunctionPointer<PFNGLVERTEX2F>(loader.Invoke("glVertex2f"));
+            _glVertex3f = Marshal.GetDelegateForFunctionPointer<PFNGLVERTEX3F>(loader.Invoke("glVertex3f"));
+            _glColor3f = Marshal.GetDelegateForFunctionPointer<PFNGLCOLOR3F>(loader.Invoke("glColor3f"));
+            _glColor4f = Marshal.GetDelegateForFunctionPointer<PFNGLCOLOR4F>(loader.Invoke("glColor4f"));
+
             _glCullFace = Marshal.GetDelegateForFunctionPointer<PFNGLCULLFACEPROC>(loader.Invoke("glCullFace"));
             _glFrontFace = Marshal.GetDelegateForFunctionPointer<PFNGLFRONTFACEPROC>(loader.Invoke("glFrontFace"));
             _glHint = Marshal.GetDelegateForFunctionPointer<PFNGLHINTPROC>(loader.Invoke("glHint"));
@@ -9999,6 +10070,10 @@ namespace OpenGL
             _glColorP4uiv = Marshal.GetDelegateForFunctionPointer<PFNGLCOLORP4UIVPROC>(loader.Invoke("glColorP4uiv"));
             _glSecondaryColorP3ui = Marshal.GetDelegateForFunctionPointer<PFNGLSECONDARYCOLORP3UIPROC>(loader.Invoke("glSecondaryColorP3ui"));
             _glSecondaryColorP3uiv = Marshal.GetDelegateForFunctionPointer<PFNGLSECONDARYCOLORP3UIVPROC>(loader.Invoke("glSecondaryColorP3uiv"));
+        
+        
+            
+        
         }
     }
 }

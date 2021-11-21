@@ -5,8 +5,8 @@ namespace torc
 {
     class TestRotator : Component
     {
-        public float speed = 1f;
-        public vec3 axis = new(0, 1, 0);
+        public float speed = 2.5f;
+        public vec3 axis = vec3.Up;
 
         public override void Update()
         {

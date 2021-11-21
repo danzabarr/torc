@@ -5,6 +5,12 @@ using System.Collections.Generic;
 
 namespace torc
 {
+    public enum Space
+    {
+        Self,
+        World,
+    }
+
     public sealed class GameObject : Component.Entity
     {
         public GameObject() : base() { }
@@ -89,7 +95,15 @@ namespace torc
 
             public vec3 LocalScale
             {
-                get => new(m[0, 0], m[1, 1], m[2, 2]);
+                get
+                {
+                    float x = (float)Math.Sqrt(m[0, 0] * m[0, 0] + m[0, 1] * m[0, 1] + m[0, 2] * m[0, 2]);
+                    float y = (float)Math.Sqrt(m[1, 0] * m[1, 0] + m[1, 1] * m[1, 1] + m[1, 2] * m[1, 2]);
+                    float z = (float)Math.Sqrt(m[2, 0] * m[2, 0] + m[2, 1] * m[2, 1] + m[2, 2] * m[2, 2]);
+
+                    return new vec3(x, y, z);
+                }
+                //get => new(m[0, 0], m[1, 1], m[2, 2]);
                 set
                 {
                     m[0, 0] = value.x;
@@ -159,14 +173,27 @@ namespace torc
                 }
             }
 
-            public void Translate(float x, float y, float z)
+            public void Translate(float x, float y, float z, Space space = Space.World)
             {
-                m[3] = m[0] * x + m[1] * y + m[2] * z + m[3];
+                switch (space)
+                {
+                    case Space.World:
+
+                        m[3, 0] += x;
+                        m[3, 1] += y;
+                        m[3, 2] += z;
+
+                        break;
+
+                    case Space.Self:
+                        m[3] = m[0] * x + m[1] * y + m[2] * z + m[3];
+                        break;
+                }
             }
 
-            public void Translate(vec3 v)
+            public void Translate(vec3 v, Space space = Space.World)
             {
-                m[3] = m[0] * v[0] + m[1] * v[1] + m[2] * v[2] + m[3];
+                Translate(v.x, v.y, v.z, space);
             }
 
             public void Scale(float f)
@@ -183,9 +210,55 @@ namespace torc
                 m[2] *= v.z;
             }
 
-            public void Rotate(float degrees, vec3 v)
+            public void Rotate(float degrees, vec3 v, Space space = Space.World)
             {
                 float radians = glm.radians(degrees);
+                vec3 axis = glm.normalize(v);
+
+                if (space == Space.World)
+                    axis = glm.inverse(WorldMatrix) * axis;
+
+                float c = glm.cos(radians);
+                float s = glm.sin(radians);
+
+                vec3 temp = (1.0f - c) * axis;
+
+                mat4 rotate = mat4.identity();
+                rotate[0, 0] = c + temp[0] * axis[0];
+                rotate[0, 1] = 0 + temp[0] * axis[1] + s * axis[2];
+                rotate[0, 2] = 0 + temp[0] * axis[2] - s * axis[1];
+
+                rotate[1, 0] = 0 + temp[1] * axis[0] - s * axis[2];
+                rotate[1, 1] = c + temp[1] * axis[1];
+                rotate[1, 2] = 0 + temp[1] * axis[2] + s * axis[0];
+
+                rotate[2, 0] = 0 + temp[2] * axis[0] + s * axis[1];
+                rotate[2, 1] = 0 + temp[2] * axis[1] - s * axis[0];
+                rotate[2, 2] = c + temp[2] * axis[2];
+
+                vec4 v0 = m[0] * rotate[0][0] + m[1] * rotate[0][1] + m[2] * rotate[0][2];
+                vec4 v1 = m[0] * rotate[1][0] + m[1] * rotate[1][1] + m[2] * rotate[1][2];
+                vec4 v2 = m[0] * rotate[2][0] + m[1] * rotate[2][1] + m[2] * rotate[2][2];
+
+                m[0] = v0;
+                m[1] = v1;
+                m[2] = v2;
+            }
+
+            public void Rotate(float degrees, vec3 v)
+            {
+
+                float radians = glm.radians(degrees);
+
+                //vec3 position = LocalPosition;
+                //m = glm.translate(m, -position);
+                //m = glm.rotate(radians, v) * m;
+                //m = glm.translate(m, position);
+
+                m *= glm.rotate(radians, v);
+
+                return;
+
                 float c = glm.cos(radians);
                 float s = glm.sin(radians);
 
@@ -214,13 +287,23 @@ namespace torc
                 m[2] = v2;
             }
 
-            public vec3 Forward
+            public vec3 Forward => -Back;
+            public vec3 Down => -Up;
+            public vec3 Left => -Right;
+
+            public vec3 Back
             {
                 get
                 {
-                    vec4 forward = new(0, 0, 1, 0);
-                    forward = WorldMatrix * forward;
-                    return new vec3(forward.x, forward.y, forward.z);
+                    mat4 world = WorldMatrix;
+                    float x = world[2, 0];
+                    float y = world[2, 1];
+                    float z = world[2, 2];
+                    return glm.normalize(new vec3(x, y, z));
+
+                    //vec4 forward = new(0, 0, 1, 0);
+                    //forward = glm.inverse(WorldMatrix) * forward;
+                    //return glm.normalize(new vec3(forward.x, forward.y, forward.z));
                 }
             }
 
@@ -228,9 +311,15 @@ namespace torc
             {
                 get
                 {
-                    vec4 forward = new(0, 1, 0, 0);
-                    forward = WorldMatrix * forward;
-                    return new vec3(forward.x, forward.y, forward.z);
+                    mat4 world = WorldMatrix;
+                    float x = world[1, 0];
+                    float y = world[1, 1];
+                    float z = world[1, 2];
+                    return glm.normalize(new vec3(x, y, z));
+
+                    //vec4 up = new(0, 1, 0, 0);
+                    //up = glm.inverse(WorldMatrix) * up;
+                    //return glm.normalize(new vec3(up.x, up.y, up.z));
                 }
             }
 
@@ -238,9 +327,15 @@ namespace torc
             {
                 get
                 {
-                    vec4 forward = new(1, 0, 0, 0);
-                    forward = WorldMatrix * forward;
-                    return new vec3(forward.x, forward.y, forward.z);
+                    mat4 world = WorldMatrix;
+                    float x = world[0, 0];
+                    float y = world[0, 1];
+                    float z = world[0, 2];
+                    return glm.normalize(new vec3(x, y, z));
+
+                    //vec4 right = new(1, 0, 0, 0);
+                    //right = glm.inverse(WorldMatrix) * right;
+                    //return glm.normalize(new vec3(right.x, right.y, right.z));
                 }
             }
 

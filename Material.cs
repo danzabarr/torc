@@ -12,6 +12,8 @@ namespace torc
         public Texture[] textures;
         private readonly Dictionary<string, object> properties = new();
 
+        public Texture mainTexture;
+
         public Material(Shader shader)
         {
             this.shader = shader;
@@ -20,6 +22,12 @@ namespace torc
         public void Use()
         {
             shader.Use();
+
+            if (mainTexture != null)
+            {
+                glActiveTexture(GL_TEXTURE0);
+                glBindTexture(GL_TEXTURE_2D, mainTexture.id);
+            }    
 
             if (textures != null) for (int i = 0; i < textures.Length; i++)
             {
@@ -83,14 +91,15 @@ namespace torc
         
         public void UniformLight(Light light)
         {
-            UniformLight(light.Object.Forward, light.color, light.brightness, light.specularStrength);
+            UniformLight(light.Object.Forward, light.color, light.brightness, light.specularStrength, light.specularPower);
         }
 
-        public void UniformLight(vec3 direction, vec3 color, float brightness, float specular)
+        public void UniformLight(vec3 direction, vec3 color, float brightness, float specularStrength, float specularPower)
         {
             glUniform3f(glGetUniformLocation(shader.id, "lightDir"), direction.x, direction.y, direction.z);
             glUniform3f(glGetUniformLocation(shader.id, "lightColor"), color.x * brightness, color.y * brightness, color.z * brightness);
-            glUniform1f(glGetUniformLocation(shader.id, "specularStrength"), specular);
+            glUniform1f(glGetUniformLocation(shader.id, "specularStrength"), specularStrength);
+            glUniform1f(glGetUniformLocation(shader.id, "specularPower"), specularPower);
         }
 
         public void UniformMatrices(Camera camera, mat4 model)

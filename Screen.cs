@@ -11,15 +11,16 @@ namespace torc
 {
     class Screen
     {
-
         public static readonly int MAX_KEYS = 349;
         public static readonly int MAX_BUTTONS = 8;
 
         private static bool[] keys = new bool[MAX_KEYS];
         private static bool[] buttons = new bool[MAX_BUTTONS];
+        private static ModifierKeys mod;
 
-        private static vec2 mousePosition, lastMousePosition;
-
+        private static vec2 lastMousePosition;
+        public static vec2 MousePosition { get; private set; }
+        public static vec2 MouseMovement => MousePosition - lastMousePosition;
         public static Window Window { get; private set; }
 
         public static int Width { get; private set; }
@@ -29,7 +30,12 @@ namespace torc
         {
             PrepareContext();
             Window = CreateWindow("torc", 1024, 576);
-            BindCallbacks();  
+            BindCallbacks();
+        }
+
+        public static void Update()
+        {
+            lastMousePosition = MousePosition;
         }
 
         private static void PrepareContext()
@@ -67,6 +73,8 @@ namespace torc
             Width = width;
             Height = height;
 
+            Glfw.SetInputMode(window, InputMode.Cursor, 0x00034003);
+
             return window;
         }
         
@@ -80,30 +88,17 @@ namespace torc
             return keys[(int)key];
         }
 
-        public static vec2 MousePosition()
+        public static bool IsModifierDown(ModifierKeys mod)
         {
-            return mousePosition;
+            return Screen.mod.HasFlag(mod);
         }
 
-        public static vec2 MouseMovement()
+        public static bool IsKeyDown(Keys keys, ModifierKeys mod)
         {
-            return mousePosition - lastMousePosition;
+            return IsKeyDown(keys) && IsModifierDown(mod);
         }
 
-        private static ErrorCallback errorCallback;
-        private static PositionCallback windowPositionCallback;
-        private static SizeCallback windowSizeCallback, framebufferSizeCallback;
-        private static FocusCallback windowFocusCallback;
-        private static WindowCallback closeCallback, windowRefreshCallback;
-        private static FileDropCallback dropCallback;
-        private static MouseCallback cursorPositionCallback, scrollCallback;
-        private static MouseEnterCallback cursorEnterCallback;
-        private static MouseButtonCallback mouseButtonCallback;
-        private static CharModsCallback charModsCallback;
-        private static KeyCallback keyCallback;
-        private static WindowMaximizedCallback windowMaximizeCallback;
-        private static WindowContentsScaleCallback windowContentScaleCallback;
-
+        //PRIVATE
         private static void OnError(ErrorCode code, IntPtr message)
         {
 
@@ -136,8 +131,7 @@ namespace torc
 
         private static void OnMouseMove(double x, double y)
         {
-            lastMousePosition = mousePosition;
-            mousePosition = new vec2((float)x, (float)y);
+            MousePosition = new vec2((float)x, (float)y);
         }
 
         private static void OnMouseEnter(bool entering)
@@ -148,6 +142,13 @@ namespace torc
         private static void OnMouseButton(MouseButton button, InputState state, ModifierKeys mod)
         {
             buttons[(int)button] = state != InputState.Release;
+            Screen.mod = mod;
+        }
+
+        private static void OnKey(Keys key, int code, InputState state, ModifierKeys mod)
+        {
+            keys[(int)key] = state != InputState.Release;
+            Screen.mod = mod;
         }
 
         private static void OnMouseScroll(double x, double y)
@@ -157,7 +158,7 @@ namespace torc
 
         private static void OnCharacterInput(uint cp, ModifierKeys mod)
         {
-
+            Screen.mod = mod;
         }
 
         private static void OnFramebufferSizeChanged(int width, int height)
@@ -165,17 +166,14 @@ namespace torc
             Width = width;
             Height = height;
             glViewport(0, 0, width, height);
+            Program.activeScene.main.Right = width;
+            Program.activeScene.main.Bottom = height;
             Program.activeScene.main.Aspect = (float)width / height;
         }
 
         private static void Refreshed()
         {
 
-        }
-
-        private static void OnKey(Keys key, int code, InputState state, ModifierKeys mod)
-        {
-            keys[(int)key] = state != InputState.Release;
         }
 
         private static void OnMaximizeChanged(bool maximized)
@@ -187,6 +185,25 @@ namespace torc
         {
 
         }
+
+        /*
+         * Have to set these delegate functions to actual fields otherwise the functions get
+         * garbage collected and GLFW complains that the callback doesn't exist any more.
+         * Stoopid.
+         */
+        private static ErrorCallback errorCallback;
+        private static PositionCallback windowPositionCallback;
+        private static SizeCallback windowSizeCallback, framebufferSizeCallback;
+        private static FocusCallback windowFocusCallback;
+        private static WindowCallback closeCallback, windowRefreshCallback;
+        private static FileDropCallback dropCallback;
+        private static MouseCallback cursorPositionCallback, scrollCallback;
+        private static MouseEnterCallback cursorEnterCallback;
+        private static MouseButtonCallback mouseButtonCallback;
+        private static CharModsCallback charModsCallback;
+        private static KeyCallback keyCallback;
+        private static WindowMaximizedCallback windowMaximizeCallback;
+        private static WindowContentsScaleCallback windowContentScaleCallback;
 
         private static void BindCallbacks()
         {

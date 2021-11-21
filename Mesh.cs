@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Collections.Generic;
 using GlmNet;
 
 namespace torc
@@ -295,21 +292,21 @@ namespace torc
                 new Vertex()
                 {
                     position = new vec3(+1, +1, -1) * .5f,
-                    normal = new vec3(0, 0, +1),
+                    normal = new vec3(+1, 0, 0),
                     color = new vec4(1, 1, 1, 1),
                     uv = new vec2(0, 0)
                 },
                 new Vertex()
                 {
                     position = new vec3(+1, +1, +1) * .5f,
-                    normal = new vec3(0, 0, +1),
+                    normal = new vec3(+1, 0, 0),
                     color = new vec4(1, 1, 1, 1),
                     uv = new vec2(1, 0)
                 },
                 new Vertex()
                 {
                     position = new vec3(+1, -1, +1) * .5f,
-                    normal = new vec3(0, 0, +1),
+                    normal = new vec3(+1, 0, 0),
                     color = new vec4(1, 1, 1, 1),
                     uv = new vec2(1, 1)
                 },
@@ -331,6 +328,7 @@ namespace torc
             color = new vec4(1, 1, 1, 1);
             uv = new vec2();
         }
+
         public Vertex(vec3 position, vec3 normal, vec4 color, vec2 uv)
         {
             this.position = position;
@@ -347,5 +345,4 @@ namespace torc
             this.uv = uv;
         }
     }
-
 }

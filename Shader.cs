@@ -16,13 +16,9 @@ namespace torc
             => library.TryGetValue(id, out shader);
 
         public readonly uint id;
-        public readonly string vertexPath;
-        public readonly string fragmentPath;
-        private Shader(uint id, string vertexPath, string fragmentPath)
+        private Shader(uint id)
         {
             this.id = id;
-            this.vertexPath = vertexPath;
-            this.fragmentPath = fragmentPath;
             library[id] = this;
         }
 
@@ -54,6 +50,24 @@ namespace torc
             return shader;
         }
 
+        public static Shader Create(string vertexText, string fragmentText)
+        {
+            uint vertex = CreateShader(GL_VERTEX_SHADER, vertexText);
+            uint fragment = CreateShader(GL_FRAGMENT_SHADER, fragmentText);
+
+
+            uint id = glCreateProgram();
+            glAttachShader(id, vertex);
+            glAttachShader(id, fragment);
+
+            glLinkProgram(id);
+
+            glDeleteShader(vertex);
+            glDeleteShader(fragment);
+
+            return new Shader(id);
+        }
+
         public static Shader Load(string vertexShader, string fragmentShader)
         {
             string vertexPath = directoryPath + vertexShader;
@@ -75,20 +89,9 @@ namespace torc
 
             string fragmentText = File.ReadAllText(fragmentPath);
             string vertexText = File.ReadAllText(vertexPath);
-            uint vertex = CreateShader(GL_VERTEX_SHADER, vertexText);
-            uint fragment = CreateShader(GL_FRAGMENT_SHADER, fragmentText);
 
+            return Create(vertexText, fragmentText);
 
-            uint id = glCreateProgram();
-            glAttachShader(id, vertex);
-            glAttachShader(id, fragment);
-
-            glLinkProgram(id);
-
-            glDeleteShader(vertex);
-            glDeleteShader(fragment);
-
-            return new Shader(id, vertexPath, fragmentPath);
         }
     }
 }

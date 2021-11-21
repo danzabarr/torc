@@ -8,6 +8,8 @@ namespace GLFW
     [Flags]
     public enum ModifierKeys
     {
+        None = 0x0000,
+
         /// <summary>
         ///     Either of the Shift keys.
         /// </summary>

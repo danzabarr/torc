@@ -18,6 +18,9 @@ void main()
 	gl_Position = proj * view * model * vec4(pos, 1.0);
 	fragPos = vec3(model * vec4(pos, 1.0));
 	vertexColor = color;
-	vertexNormal = vec3(proj * view * model * vec4(normal, 1.0));
+	//vertexNormal = normalize(vec3(model * vec4(normal, 0)));
+	vertexNormal = normalize(mat3(transpose(inverse(model))) * normal);
+	//vertexNormal = normalize(vec3(inverse(model) * vec4(normal, 1.0)));
+
 	texCoord = uv;
 }

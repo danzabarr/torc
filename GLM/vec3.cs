@@ -7,6 +7,13 @@ namespace GlmNet
     /// </summary>
     public struct vec3
     {
+        public static vec3 Up = new(0, 1, 0);
+        public static vec3 Down = new(0, -1, 0);
+        public static vec3 Right = new(1, 0, 0);
+        public static vec3 Left = new(-1, 0, 0);
+        public static vec3 Forward = new(0, 0, -1);
+        public static vec3 Back = new(0, 0, 1);
+
         public float x;
         public float y;
         public float z;
@@ -99,6 +106,16 @@ namespace GlmNet
         public static vec3 operator *(vec3 lhs, vec3 rhs)
         {
             return new vec3(rhs.x * lhs.x, rhs.y * lhs.y, rhs.z * lhs.z);
+        }
+
+        public static vec3 operator +(vec3 self)
+        {
+            return self;
+        }
+
+        public static vec3 operator -(vec3 self)
+        {
+            return new vec3(-self.x, -self.y, -self.z);
         }
 
         public float[] to_array()

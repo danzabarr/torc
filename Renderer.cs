@@ -12,6 +12,7 @@
         public void UseMaterial(Camera camera)
         {
             material.Use();
+            material.UniformLight(DirectionalLight.main);
             material.UniformMatrices(camera.Object.Position, Object.WorldMatrix, camera.ViewMatrix, camera.ProjectionMatrix);
         }
 
