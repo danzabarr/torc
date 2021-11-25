@@ -11,16 +11,7 @@ namespace torc
 {
     class Screen
     {
-        public static readonly int MAX_KEYS = 349;
-        public static readonly int MAX_BUTTONS = 8;
-
-        private static bool[] keys = new bool[MAX_KEYS];
-        private static bool[] buttons = new bool[MAX_BUTTONS];
-        private static ModifierKeys mod;
-
-        private static vec2 lastMousePosition;
-        public static vec2 MousePosition { get; private set; }
-        public static vec2 MouseMovement => MousePosition - lastMousePosition;
+        
         public static Window Window { get; private set; }
 
         public static int Width { get; private set; }
@@ -31,11 +22,6 @@ namespace torc
             PrepareContext();
             Window = CreateWindow("torc", 1024, 576);
             BindCallbacks();
-        }
-
-        public static void Update()
-        {
-            lastMousePosition = MousePosition;
         }
 
         private static void PrepareContext()
@@ -78,27 +64,7 @@ namespace torc
             return window;
         }
         
-        public static bool IsKeyDown(Keys key)
-        {
-            if ((int)key < 0)
-                return false;
-
-            if ((int)key >= MAX_KEYS)
-                return false;
-            return keys[(int)key];
-        }
-
-        public static bool IsModifierDown(ModifierKeys mod)
-        {
-            return Screen.mod.HasFlag(mod);
-        }
-
-        public static bool IsKeyDown(Keys keys, ModifierKeys mod)
-        {
-            return IsKeyDown(keys) && IsModifierDown(mod);
-        }
-
-        //PRIVATE
+        
         private static void OnError(ErrorCode code, IntPtr message)
         {
 
@@ -127,38 +93,6 @@ namespace torc
         private static void OnFileDrop(int count, IntPtr arrayPtr)
         {
 
-        }
-
-        private static void OnMouseMove(double x, double y)
-        {
-            MousePosition = new vec2((float)x, (float)y);
-        }
-
-        private static void OnMouseEnter(bool entering)
-        {
-
-        }
-
-        private static void OnMouseButton(MouseButton button, InputState state, ModifierKeys mod)
-        {
-            buttons[(int)button] = state != InputState.Release;
-            Screen.mod = mod;
-        }
-
-        private static void OnKey(Keys key, int code, InputState state, ModifierKeys mod)
-        {
-            keys[(int)key] = state != InputState.Release;
-            Screen.mod = mod;
-        }
-
-        private static void OnMouseScroll(double x, double y)
-        {
-
-        }
-
-        private static void OnCharacterInput(uint cp, ModifierKeys mod)
-        {
-            Screen.mod = mod;
         }
 
         private static void OnFramebufferSizeChanged(int width, int height)
@@ -213,14 +147,14 @@ namespace torc
             windowFocusCallback = (_, focusing) => OnFocusChanged(focusing);
             closeCallback = _ => OnClosing();
             dropCallback = (_, count, arrayPtr) => OnFileDrop(count, arrayPtr);
-            cursorPositionCallback = (_, x, y) => OnMouseMove(x, y);
-            cursorEnterCallback = (_, entering) => OnMouseEnter(entering);
-            mouseButtonCallback = (_, button, state, mod) => OnMouseButton(button, state, mod);
-            scrollCallback = (_, x, y) => OnMouseScroll(x, y);
-            charModsCallback = (_, cp, mods) => OnCharacterInput(cp, mods);
+            cursorPositionCallback = (_, x, y) => Input.OnMouseMove(x, y);
+            cursorEnterCallback = (_, entering) => Input.OnMouseEnter(entering);
+            mouseButtonCallback = (_, button, state, mod) => Input.OnMouseButton(button, state, mod);
+            scrollCallback = (_, x, y) => Input.OnMouseScroll(x, y);
+            charModsCallback = (_, cp, mods) => Input.OnCharacterInput(cp, mods);
             framebufferSizeCallback = (_, w, h) => OnFramebufferSizeChanged(w, h);
             windowRefreshCallback = _ => Refreshed();
-            keyCallback = (_, key, code, state, mods) => OnKey(key, code, state, mods);
+            keyCallback = (_, key, code, state, mods) => Input.OnKey(key, code, state, mods);
             windowMaximizeCallback = (_, maximized) => OnMaximizeChanged(maximized);
             windowContentScaleCallback = (_, x, y) => OnContentScaleChanged(x, y);
 

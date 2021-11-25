@@ -21,6 +21,7 @@ class Program
     {
         Screen.Init();
         InitGLCapabilities();
+        Texture.CreateTextures();
         LoadScene();
         MainLoop();
     }
@@ -34,6 +35,7 @@ class Program
 
     private static Shader shader;
     private static Material material;
+    private static Material material2;
 
     private static void LoadScene()
     {
@@ -49,18 +51,9 @@ class Program
 
         camera.Mode = CameraMode.Perspective;
         camera.Aspect = (float)Screen.Width / (float)Screen.Height;
-        Console.WriteLine($"r {camera.Object.Right}");
-        Console.WriteLine($"u {camera.Object.Up}");
-        Console.WriteLine($"f {camera.Object.Forward}");
 
         camera.Object.Rotate(-20, new(1, 0, 0));
         camera.Object.Translate(0, 0, 10, Space.Self);
-
-        Console.WriteLine($"e {camera.Object.EulerAngles}");
-
-        Console.WriteLine($"r {camera.Object.Right}");
-        Console.WriteLine($"u {camera.Object.Up}");
-        Console.WriteLine($"f {camera.Object.Forward}");
 
         DirectionalLight light = new GameObject().AddComponent<DirectionalLight>();
         light.color = new(1, 1, 1);
@@ -73,14 +66,18 @@ class Program
         cube.Translate(1, 0, 0);
         cube.Rotate(45, new vec3(0, 1, 0));
         cube.AddComponent<TransformGizmos>();
-        
+
+        Texture yoda = Texture.Load("yoda.jpg");
+        Texture brickNormal = Texture.Load("brick_normal_map.png");
+
         shader = Shader.Load("simple.vert", "simple.frag");
 
         material = new(shader);
-        material.mainTexture = new Texture("yoda.jpg");
-        material.Use();
-        material.UploadProperties();
-        material.UniformLight(light);
+        material.mainTexture = yoda;
+        material.normalMap = brickNormal;
+
+        material2 = new(shader);
+        material2.mainTexture = yoda;
 
         MeshRenderer cubeRenderer = cube.AddComponent<MeshRenderer>();
         cubeRenderer.material = material;
@@ -90,7 +87,7 @@ class Program
         floor.Translate(0, -1, 0);
         floor.Scale(new vec3(10, .1f, 10));
         MeshRenderer floorRenderer = floor.AddComponent<MeshRenderer>();
-        floorRenderer.material = material;
+        floorRenderer.material = material2;
         floorRenderer.Mesh = Mesh.Cube;
 
         GameObject missile = new();
@@ -166,6 +163,6 @@ class Program
     private static void Update()
     {
         activeScene.Update();
-        Screen.Update();
+        Input.Update();
     }
 }

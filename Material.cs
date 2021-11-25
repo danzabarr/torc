@@ -13,6 +13,8 @@ namespace torc
         private readonly Dictionary<string, object> properties = new();
 
         public Texture mainTexture;
+        public Texture normalMap;
+
 
         public Material(Shader shader)
         {
@@ -23,17 +25,32 @@ namespace torc
         {
             shader.Use();
 
+            glActiveTexture(GL_TEXTURE0);
             if (mainTexture != null)
             {
-                glActiveTexture(GL_TEXTURE0);
                 glBindTexture(GL_TEXTURE_2D, mainTexture.id);
-            }    
-
-            if (textures != null) for (int i = 0; i < textures.Length; i++)
-            {
-                glActiveTexture(i);
-                glBindTexture(GL_TEXTURE_2D, textures[i].id);
             }
+            else
+            {
+                glBindTexture(GL_TEXTURE_2D, 0);
+            }
+
+            glActiveTexture(GL_TEXTURE1);
+            if (normalMap != null)
+            {
+                glBindTexture(GL_TEXTURE_2D, normalMap.id);
+            }
+            else
+            {
+                glBindTexture(GL_TEXTURE_2D, Texture.BlankNormal.id);
+            }
+
+            glActiveTexture(GL_TEXTURE0);
+            //if (textures != null) for (int i = 0; i < textures.Length; i++)
+            //{
+            //    glActiveTexture(i);
+            //    glBindTexture(GL_TEXTURE_2D, textures[i].id);
+            //}
         }
 
         public int GetUniformLocation(string name)
