@@ -123,6 +123,24 @@ namespace GlmNet
             return new[] { x, y, z };
         }
 
+        public float Length()
+        {
+            return (float)Math.Sqrt(x * x + y * y + z * z);
+        }
+
+        public vec3 Normalized()
+        {
+            return this / Length();
+        }
+
+        public void Normalize()
+        {
+            float length = Length();
+            x /= length;
+            y /= length;
+            z /= length;
+        }
+
         #region Comparision
         
         /// <summary>

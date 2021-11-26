@@ -13,7 +13,8 @@ namespace torc
         {
             UseMaterial(camera);
 
-            Mesh.Render();
+            if (Mesh != null)
+                Mesh.Render();
         }
     }
 }

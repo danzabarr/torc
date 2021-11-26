@@ -32,14 +32,19 @@ namespace torc
             return glGetUniformLocation(id, name);
         }
 
-        public void UniformMatrix4fv(string location, mat4 matrix)
+        public void UniformMatrix4fv(string name, mat4 matrix)
         {
-            glUniformMatrix4fv(GetUniformLocation(location), 1, false, matrix.to_array());
+            glUniformMatrix4fv(GetUniformLocation(name), 1, false, matrix.to_array());
         }
 
-        public void UniformFloat(string location, float f)
+        public void Uniform1f(string name, float f)
         {
-            glUniform1f(GetUniformLocation(location), f);
+            glUniform1f(GetUniformLocation(name), f);
+        }
+
+        public void Uniform4f(string name, vec4 v)
+        {
+            glUniform4f(GetUniformLocation(name), v.x, v.y, v.z, v.w);
         }
 
         private static uint CreateShader(int type, string source)

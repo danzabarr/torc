@@ -32,7 +32,7 @@ namespace torc
             }
             else
             {
-                glBindTexture(GL_TEXTURE_2D, 0);
+                glBindTexture(GL_TEXTURE_2D, Texture.White.id);
             }
 
             glActiveTexture(GL_TEXTURE1);
@@ -106,6 +106,11 @@ namespace torc
             }
         }
         
+        public void UniformAmbientLight()
+        {
+            shader.Uniform4f("ambient", Light.AmbientLight);
+        }
+
         public void UniformLight(Light light)
         {
             UniformLight(light.Object.Forward, light.color, light.brightness, light.specularStrength, light.specularPower);

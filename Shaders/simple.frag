@@ -6,6 +6,7 @@ in vec3 fragPos;
 in mat3 TBN;
 out vec4 result;
 
+uniform vec4 ambient = vec4(0, 0, 0, 1);
 uniform vec3 color = vec3(1, 1, 1);
 uniform vec3 lightDir = vec3(0, 0, 0);
 uniform vec3 lightColor = vec3(1, 1, 1);
@@ -33,6 +34,8 @@ void main()
 	float specular = specularStrength * pow(max(dot(viewDir, reflectDir), 0.0), specularPower);
 
 	vec3 lighting = (diffuse + specular) * lightColor;
+
+	lighting = max(lighting, ambient.xyz * ambient.w);
 
 	result = texture(texture0, texCoord) * vec4(lighting, 1);
 }

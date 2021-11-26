@@ -64,24 +64,29 @@ class Program
         GameObject cube = new();
         cube.AddComponent<TestRotator>();
         cube.Translate(1, 0, 0);
-        cube.Rotate(45, new vec3(0, 1, 0));
-        cube.AddComponent<TransformGizmos>();
+
+        GameObject cube2 = new();
+        cube2.AddComponent<TestRotator>();
+        cube2.Translate(-2, 0, 0);
 
         Texture yoda = Texture.Load("yoda.jpg");
         Texture brickNormal = Texture.Load("brick_normal_map.png");
 
         shader = Shader.Load("simple.vert", "simple.frag");
-
         material = new(shader);
-        material.mainTexture = yoda;
+        //material.mainTexture = yoda;
         material.normalMap = brickNormal;
 
         material2 = new(shader);
-        material2.mainTexture = yoda;
+        //material2.mainTexture = yoda;
 
         MeshRenderer cubeRenderer = cube.AddComponent<MeshRenderer>();
         cubeRenderer.material = material;
-        cubeRenderer.Mesh = Mesh.Cube;
+        cubeRenderer.Mesh = Mesh.SmoothCube;
+
+        MeshRenderer cubeRenderer2 = cube2.AddComponent<MeshRenderer>();
+        cubeRenderer2.material = material;
+        cubeRenderer2.Mesh = Mesh.Cube;
 
         GameObject floor = new();
         floor.Translate(0, -1, 0);
@@ -95,16 +100,29 @@ class Program
         missile.Scale(.2f);
         missile.Rotate(90, new(-1, 0, 0));
 
-        missileRenderer.Mesh = Mesh.LoadObjFile("missile.obj");
+        missileRenderer.Mesh = Mesh.Missile;
         missileRenderer.material = material;
 
         missile.Parent = light.Object;
+
+        GameObject bigMissile = new();
+        MeshRenderer bigMissileRenderer = bigMissile.AddComponent<MeshRenderer>();
+        bigMissileRenderer.material = material;
+        bigMissileRenderer.Mesh = missileRenderer.Mesh;
+        bigMissile.Translate(5, 8, 0);
+        bigMissile.Rotate(-150, new vec3(1, 1, 0));
+        bigMissile.Scale(1);
+
+        TestRotator missileRotator = bigMissile.AddComponent<TestRotator>();
+        missileRotator.axis = new vec3(0, 1, 1);
 
         activeScene.Add(camera.Object);
         activeScene.Add(light.Object);
         activeScene.Add(missile);
         activeScene.Add(cube);
+        activeScene.Add(cube2);
         activeScene.Add(floor);
+        activeScene.Add(bigMissile);
     }
 
     private static void MainLoop()
@@ -140,6 +158,7 @@ class Program
 
         Glfw.Terminate();
     }
+
     private static long NanoTime()
     {
         long nano = 10000L * System.Diagnostics.Stopwatch.GetTimestamp();
