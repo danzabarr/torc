@@ -5,7 +5,7 @@ using System;
 
 namespace torc
 {
-    class Texture
+    public class Texture
     {
         enum Wrap
         {
@@ -80,8 +80,8 @@ namespace torc
             string path,
             int wrapS = GL_TEXTURE_WRAP_S, 
             int wrapT = GL_TEXTURE_WRAP_T, 
-            int minFilter = GL_NEAREST, 
-            int magFilter = GL_NEAREST)
+            int minFilter = GL_LINEAR, 
+            int magFilter = GL_LINEAR)
         {
             uint id = glGenTexture();
             glBindTexture(GL_TEXTURE_2D, id);

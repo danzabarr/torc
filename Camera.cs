@@ -9,7 +9,7 @@ namespace torc
         Orthographic
     }
 
-    class Camera : Component
+    public class Camera : Component
     {
         private mat4 proj;
         private CameraMode mode = CameraMode.Perspective;

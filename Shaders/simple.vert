@@ -11,10 +11,13 @@ out vec3 vertexNormal;
 out vec2 texCoord;
 out vec3 fragPos;
 out mat3 TBN;
+out vec4 FragPosLightSpace;
+
 
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 proj;
+uniform mat4 lightSpaceMatrix;
 
 void main()
 {
@@ -31,4 +34,7 @@ void main()
 	//vertexNormal = normalize(mat3(transpose(inverse(model))) * normal);
 
 	texCoord = uv;
+
+    FragPosLightSpace = lightSpaceMatrix * vec4(fragPos, 1.0);
+
 }

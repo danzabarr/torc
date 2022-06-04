@@ -11,10 +11,31 @@ namespace torc
 
         public override void Render(Camera camera)
         {
-            UseMaterial(camera);
+            if (Mesh == null)
+                return;
 
-            if (Mesh != null)
-                Mesh.Render();
+            if (material == null)
+                return;
+
+            material.Use();
+            material.UniformAmbientLight(Light.AmbientLight);
+            material.UniformLight(DirectionalLight.main);
+            material.UniformMatrices(camera.Object.Position, Object.WorldMatrix, camera.ViewMatrix, camera.ProjectionMatrix);
+
+            Mesh.Render();
+        }
+
+        public override void Render(Shader shader)
+        {
+            if (Mesh == null)
+                return;
+
+            if (shader == null)
+                return;
+
+            shader.Use();
+            shader.UniformMatrix4fv("model", Object.WorldMatrix);
+            Mesh.Render();
         }
     }
 }

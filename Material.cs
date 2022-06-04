@@ -6,7 +6,7 @@ using System;
 
 namespace torc
 {
-    class Material
+    public class Material
     {
         public Shader shader;
         public Texture[] textures;
@@ -44,6 +44,9 @@ namespace torc
             {
                 glBindTexture(GL_TEXTURE_2D, Texture.BlankNormal.id);
             }
+
+            glActiveTexture(GL_TEXTURE2);
+            glBindTexture(GL_TEXTURE_2D, DirectionalLight.main.DepthMap);
 
             glActiveTexture(GL_TEXTURE0);
             //if (textures != null) for (int i = 0; i < textures.Length; i++)
@@ -106,35 +109,31 @@ namespace torc
             }
         }
         
-        public void UniformAmbientLight()
+        public void UniformAmbientLight(vec4 color)
         {
-            shader.Uniform4f("ambient", Light.AmbientLight);
+            shader.UniformAmbientLight(color);
         }
 
         public void UniformLight(Light light)
         {
-            UniformLight(light.Object.Forward, light.color, light.brightness, light.specularStrength, light.specularPower);
+            shader.UniformLight(light);
         }
 
         public void UniformLight(vec3 direction, vec3 color, float brightness, float specularStrength, float specularPower)
         {
-            glUniform3f(glGetUniformLocation(shader.id, "lightDir"), direction.x, direction.y, direction.z);
-            glUniform3f(glGetUniformLocation(shader.id, "lightColor"), color.x * brightness, color.y * brightness, color.z * brightness);
-            glUniform1f(glGetUniformLocation(shader.id, "specularStrength"), specularStrength);
-            glUniform1f(glGetUniformLocation(shader.id, "specularPower"), specularPower);
+            shader.UniformLight(direction, color, brightness, specularStrength, specularPower);
+
+            shader.UniformMatrix4fv("lightSpaceMatrix", DirectionalLight.main.LightSpaceMatrix);
         }
 
         public void UniformMatrices(Camera camera, mat4 model)
         {
-            UniformMatrices(camera.Object.Position, model, camera.ViewMatrix, camera.ProjectionMatrix);   
+            shader.UniformMatrices(camera, model);
         }
 
         public void UniformMatrices(vec3 viewPos, mat4 model, mat4 view, mat4 proj)
         {
-            glUniform3f(glGetUniformLocation(shader.id, "viewPos"), viewPos.x, viewPos.y, viewPos.z); 
-            glUniformMatrix4fv(glGetUniformLocation(shader.id, "model"), 1, false, model.to_array());
-            glUniformMatrix4fv(glGetUniformLocation(shader.id, "view"), 1, false, view.to_array());
-            glUniformMatrix4fv(glGetUniformLocation(shader.id, "proj"), 1, false, proj.to_array());
+            shader.UniformMatrices(viewPos, model, view, proj);
         }
     }
 }

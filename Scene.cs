@@ -38,5 +38,11 @@ namespace torc
             foreach (GameObject o in objects)
                 o.Render();
         }
+
+        public void Render(Shader shader)
+        {
+            foreach (GameObject o in objects)
+                o.Render(shader);
+        }
     }
 }

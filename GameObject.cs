@@ -33,6 +33,12 @@ namespace torc
             foreach (Renderer r in EnumerateComponents<Renderer>())
                 r.Render();
         }
+
+        public void Render(Shader shader)
+        {
+            foreach (Renderer r in EnumerateComponents<Renderer>())
+                r.Render(shader);
+        }
     }
 
     public abstract class Component

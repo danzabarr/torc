@@ -75,10 +75,11 @@ class Program
         shader = Shader.Load("simple.vert", "simple.frag");
         material = new(shader);
         //material.mainTexture = yoda;
-        material.normalMap = brickNormal;
+        //material.normalMap = brickNormal;
 
         material2 = new(shader);
         //material2.mainTexture = yoda;
+        material2.normalMap = brickNormal;
 
         MeshRenderer cubeRenderer = cube.AddComponent<MeshRenderer>();
         cubeRenderer.material = material;
@@ -169,14 +170,23 @@ class Program
 
     private static void Render()
     {
-        // Swap fore/back framebuffers, and poll for operating system events.
-        Glfw.SwapBuffers(Screen.Window);
-        Glfw.PollEvents();
+        glClearColor(0, 0, 0, 1);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        // 1. first render to depth map
+        DirectionalLight.main.RenderScene();
+
+        // 2. then render scene as normal with shadow mapping (using depth map)
 
         // Clear the framebuffer to defined background color
+        glViewport(0, 0, Screen.Width, Screen.Height);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         activeScene.Render();
+        
+        // Swap fore/back framebuffers, and poll for operating system events.
+        Glfw.SwapBuffers(Screen.Window);
+        Glfw.PollEvents();
     }
 
     private static void Update()

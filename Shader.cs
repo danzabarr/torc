@@ -6,7 +6,7 @@ using GlmNet;
 
 namespace torc
 {
-    class Shader
+    public class Shader
     {
         public static string directoryPath = "../../../Shaders/";
 
@@ -97,6 +97,37 @@ namespace torc
 
             return Create(vertexText, fragmentText);
 
+        }
+
+        public void UniformAmbientLight(vec4 color)
+        {
+            Uniform4f("ambient", color);
+        }
+
+        public void UniformLight(Light light)
+        {
+            UniformLight(light.Object.Forward, light.color, light.brightness, light.specularStrength, light.specularPower);
+        }
+
+        public void UniformLight(vec3 direction, vec3 color, float brightness, float specularStrength, float specularPower)
+        {
+            glUniform3f(glGetUniformLocation(id, "lightDir"), direction.x, direction.y, direction.z);
+            glUniform3f(glGetUniformLocation(id, "lightColor"), color.x * brightness, color.y * brightness, color.z * brightness);
+            glUniform1f(glGetUniformLocation(id, "specularStrength"), specularStrength);
+            glUniform1f(glGetUniformLocation(id, "specularPower"), specularPower);
+        }
+
+        public void UniformMatrices(Camera camera, mat4 model)
+        {
+            UniformMatrices(camera.Object.Position, model, camera.ViewMatrix, camera.ProjectionMatrix);
+        }
+
+        public void UniformMatrices(vec3 viewPos, mat4 model, mat4 view, mat4 proj)
+        {
+            glUniform3f(glGetUniformLocation(id, "viewPos"), viewPos.x, viewPos.y, viewPos.z);
+            glUniformMatrix4fv(glGetUniformLocation(id, "model"), 1, false, model.to_array());
+            glUniformMatrix4fv(glGetUniformLocation(id, "view"), 1, false, view.to_array());
+            glUniformMatrix4fv(glGetUniformLocation(id, "proj"), 1, false, proj.to_array());
         }
     }
 }
