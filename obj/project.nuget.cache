@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "dgSpecHash": "z4JckF1dofXOLjacUAPs8YBXN+XUSgXgV3aZtq7HWhknwyC1WAhqPn+K+i3ZRUlU7bYAcXIS471cfjv4V+S7tA==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\Dan\\Documents\\GitHub\\torc\\torc.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Dan\\.nuget\\packages\\microsoft.win32.systemevents\\6.0.0\\microsoft.win32.systemevents.6.0.0.nupkg.sha512",
+    "C:\\Users\\Dan\\.nuget\\packages\\sharpfont\\4.0.1\\sharpfont.4.0.1.nupkg.sha512",
+    "C:\\Users\\Dan\\.nuget\\packages\\sharpfont.dependencies\\2.6.0\\sharpfont.dependencies.2.6.0.nupkg.sha512",
+    "C:\\Users\\Dan\\.nuget\\packages\\sixlabors.imagesharp\\1.0.4\\sixlabors.imagesharp.1.0.4.nupkg.sha512",
+    "C:\\Users\\Dan\\.nuget\\packages\\system.drawing.common\\6.0.0\\system.drawing.common.6.0.0.nupkg.sha512"
+  ],
+  "logs": []
+}
