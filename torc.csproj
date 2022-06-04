@@ -16,21 +16,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="C:\Users\Dan\.nuget\packages\sharpfont.dependencies\2.6.0\build\..\bin\msvc10\x64\freetype6.dll" />
+    <Content Remove="C:\Users\Dan\.nuget\packages\sharpfont\4.0.1\build\..\config\SharpFont.dll.config" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="GLM\" />
-    <Folder Include="Fonts\" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="SharpFont" Version="4.0.1" />
-    <PackageReference Include="SharpFont.Dependencies" Version="2.6.0" />
-    <PackageReference Include="SixLabors.ImageSharp" Version="1.0.4" />
     <PackageReference Include="System.Drawing.Common" Version="6.0.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="SharpFont">
-      <HintPath>bin\Debug\net5.0\SharpFont.dll</HintPath>
-    </Reference>
   </ItemGroup>
 
 </Project>

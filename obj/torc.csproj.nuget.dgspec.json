@@ -40,18 +40,6 @@
         "net5.0": {
           "targetAlias": "net5.0",
           "dependencies": {
-            "SharpFont": {
-              "target": "Package",
-              "version": "[4.0.1, )"
-            },
-            "SharpFont.Dependencies": {
-              "target": "Package",
-              "version": "[2.6.0, )"
-            },
-            "SixLabors.ImageSharp": {
-              "target": "Package",
-              "version": "[1.0.4, )"
-            },
             "System.Drawing.Common": {
               "target": "Package",
               "version": "[6.0.0, )"

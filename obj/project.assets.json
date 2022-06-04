@@ -20,30 +20,6 @@
           }
         }
       },
-      "SharpFont/4.0.1": {
-        "type": "package",
-        "dependencies": {
-          "SharpFont.Dependencies": "(, )"
-        },
-        "build": {
-          "build/SharpFont.props": {}
-        }
-      },
-      "SharpFont.Dependencies/2.6.0": {
-        "type": "package",
-        "build": {
-          "build/SharpFont.Dependencies.props": {}
-        }
-      },
-      "SixLabors.ImageSharp/1.0.4": {
-        "type": "package",
-        "compile": {
-          "lib/netcoreapp3.1/SixLabors.ImageSharp.dll": {}
-        },
-        "runtime": {
-          "lib/netcoreapp3.1/SixLabors.ImageSharp.dll": {}
-        }
-      },
       "System.Drawing.Common/6.0.0": {
         "type": "package",
         "dependencies": {
@@ -101,66 +77,6 @@
         "useSharedDesignerContext.txt"
       ]
     },
-    "SharpFont/4.0.1": {
-      "sha512": "yoFLcuWMYdBGB4YLq3bvzrctItJIb+EuK7C7PGgBzqsKxx5UXUwTce64kbvuDQWlMf6p4uQwDm5t2rQdZ9EkyA==",
-      "type": "package",
-      "path": "sharpfont/4.0.1",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "build/SharpFont.props",
-        "config/SharpFont.dll.config",
-        "lib/net45/SharpFont.dll",
-        "lib/net45/SharpFont.dll.config",
-        "lib/net45/SharpFont.xml",
-        "sharpfont.4.0.1.nupkg.sha512",
-        "sharpfont.nuspec"
-      ]
-    },
-    "SharpFont.Dependencies/2.6.0": {
-      "sha512": "MuR0lFIZI1pSw0QAgdzK0teIUkkMjh4Q/3Hm06BQKuOiSmbJCglox5Ny+8XK6VQDkOrw5cuMw85K3HdTEYWk+w==",
-      "type": "package",
-      "path": "sharpfont.dependencies/2.6.0",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "bin/msvc10/x64/freetype6.dll",
-        "bin/msvc10/x86/freetype6.dll",
-        "bin/msvc11/x64/freetype6.dll",
-        "bin/msvc11/x86/freetype6.dll",
-        "bin/msvc12/x64/freetype6.dll",
-        "bin/msvc12/x86/freetype6.dll",
-        "bin/msvc9/x64/freetype6.dll",
-        "bin/msvc9/x86/freetype6.dll",
-        "build/SharpFont.Dependencies.props",
-        "sharpfont.dependencies.2.6.0.nupkg.sha512",
-        "sharpfont.dependencies.nuspec"
-      ]
-    },
-    "SixLabors.ImageSharp/1.0.4": {
-      "sha512": "H2rPiEr2ddBOltOuqRYhpLBAsQXDAhbzMMhhuksnBG2oefup1MXMchALe7yYkKJksNbtxbZHKeM6dn/68I75qw==",
-      "type": "package",
-      "path": "sixlabors.imagesharp/1.0.4",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "lib/net472/SixLabors.ImageSharp.dll",
-        "lib/net472/SixLabors.ImageSharp.xml",
-        "lib/netcoreapp2.1/SixLabors.ImageSharp.dll",
-        "lib/netcoreapp2.1/SixLabors.ImageSharp.xml",
-        "lib/netcoreapp3.1/SixLabors.ImageSharp.dll",
-        "lib/netcoreapp3.1/SixLabors.ImageSharp.xml",
-        "lib/netstandard1.3/SixLabors.ImageSharp.dll",
-        "lib/netstandard1.3/SixLabors.ImageSharp.xml",
-        "lib/netstandard2.0/SixLabors.ImageSharp.dll",
-        "lib/netstandard2.0/SixLabors.ImageSharp.xml",
-        "lib/netstandard2.1/SixLabors.ImageSharp.dll",
-        "lib/netstandard2.1/SixLabors.ImageSharp.xml",
-        "sixlabors.imagesharp.1.0.4.nupkg.sha512",
-        "sixlabors.imagesharp.128.png",
-        "sixlabors.imagesharp.nuspec"
-      ]
-    },
     "System.Drawing.Common/6.0.0": {
       "sha512": "NfuoKUiP2nUWwKZN6twGqXioIe1zVD0RIj2t976A+czLHr2nY454RwwXs6JU9Htc6mwqL6Dn/nEL3dpVf2jOhg==",
       "type": "package",
@@ -203,9 +119,6 @@
   },
   "projectFileDependencyGroups": {
     "net5.0": [
-      "SharpFont >= 4.0.1",
-      "SharpFont.Dependencies >= 2.6.0",
-      "SixLabors.ImageSharp >= 1.0.4",
       "System.Drawing.Common >= 6.0.0"
     ]
   },
@@ -248,18 +161,6 @@
       "net5.0": {
         "targetAlias": "net5.0",
         "dependencies": {
-          "SharpFont": {
-            "target": "Package",
-            "version": "[4.0.1, )"
-          },
-          "SharpFont.Dependencies": {
-            "target": "Package",
-            "version": "[2.6.0, )"
-          },
-          "SixLabors.ImageSharp": {
-            "target": "Package",
-            "version": "[1.0.4, )"
-          },
           "System.Drawing.Common": {
             "target": "Package",
             "version": "[6.0.0, )"

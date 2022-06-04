@@ -4,7 +4,6 @@ using GLFW;
 using GlmNet;
 using System.Timers;
 using static OpenGL.GL;
-using SharpFont;
 
 class Program
 {
